@@ -94,24 +94,43 @@ export default function App() {
   const handleButtonPress = async () => {
     const location = {
       "location": {
-        "street_address": addressText.trim() === '' ? '1646 E ELMORE AVE' : addressText,
-        "city": cityText.trim() === '' ? 'Dallas' : cityText,
-        "postal_code": codeText.trim() === '' ? '75216' : codeText,
-        "state": stateText.trim() === '' ? 'TX' : stateText,
+        "street_address": addressText.trim() === '' ? '552 51st Ave' : addressText,
+        "city": cityText.trim() === '' ? 'NY' : cityText,
+        "postal_code": codeText.trim() === '' ? '11101' : codeText,
+        "state": stateText.trim() === '' ? 'NY' : stateText,
         "country": countryText.trim() === '' ? 'US' : countryText
-      }
+      } 
     };
 
-    //const { lat, lon } = await getLatLonFromLocation(location);
-    const lat = '32.7175991';
-    const lon = '-96.7981047'
+    const { lat, lon } = await getLatLonFromLocation(location);
+    //const lat = '32.7175991';
+    //const lon = '-96.7981047'
+    console.log(location);
     console.log(`Latitude: ${lat}, Longitude: ${lon}`);
 
 
-    const overpassTemplate = `[out:json];(nodeQUESTION(around:1000,${lat},${lon}););out;`;
-    const overpassQuery = overpassTemplate.replace('QUESTION', '["public_transport"]["wheelchair"="yes"]');
+    const overpassTemplate = `[out:json];(QUESTION(around:1000,${lat},${lon}););out;`;
+    let overpassQuery = overpassTemplate.replace('QUESTION', 'node["public_transport"]');
     const busCount = await getDataFromLatLon(overpassQuery);
     console.log(busCount);
+    overpassQuery = overpassTemplate.replace('QUESTION', 'node["public_transport"]["wheelchair"="yes"]');
+    const busEasyCount = await getDataFromLatLon(overpassQuery);
+    console.log(busEasyCount);
+    overpassQuery = overpassTemplate.replace('QUESTION', 'way["highway"="footway"]');
+    const footwayCount = await getDataFromLatLon(overpassQuery);
+    console.log(footwayCount);
+    overpassQuery = overpassTemplate.replace('QUESTION', 'way["highway"="path"]');
+    const pathCount = await getDataFromLatLon(overpassQuery);
+    console.log(pathCount);
+    overpassQuery = overpassTemplate.replace('QUESTION', 'way["kerb"="yes"]');
+    const kerbCount = await getDataFromLatLon(overpassQuery);
+    console.log(kerbCount);
+    overpassQuery = overpassTemplate.replace('QUESTION', 'way["kerb:ramp"="path"]');
+    const kerbRampCount = await getDataFromLatLon(overpassQuery);
+    console.log(kerbRampCount);
+    overpassQuery = overpassTemplate.replace('QUESTION', 'way["highway"="crossing"]');
+    const crossingCount = await getDataFromLatLon(overpassQuery);
+    console.log(crossingCount);
 
     const mediaList = await getMediaList(location);
     console.log("Control first POST\n"+mediaList);
