@@ -10,11 +10,11 @@ export default function App() {
   const [codeText, setCodeText] = useState('');
   const [stateText, setStateText] = useState('');
   const [countryText, setCountryText] = useState('');
-  const [displayText, setDisplayText] = useState('');
-  const [stairsNum, setNumStairs] = useState(0);
-  const [hasElevator, setHasElevator] = useState(false);
-  const [score, setScore] = useState(7);
-  const [imageLink, setLink] = useState('');
+  let [displayText, setDisplayText] = useState('');
+  let [stairsNum, setNumStairs] = useState(0);
+  let [hasElevator, setHasElevator] = useState(false);
+  let [score, setScore] = useState(7);
+  let [imageLink, setLink] = useState('');
   const handleAddressChange = (text) => {
     setAddressText(text);
   };
@@ -115,9 +115,9 @@ export default function App() {
 
     const mediaList = await getMediaList(location);
     console.log("Control first POST\n"+mediaList);
-    setScore(7);
-    setNumStairs(0);
-    setHasElevator(false);
+      score = 7;
+      stairsNum = 0;
+      hasElevator = false;
     // Iterate through each image URL in the 'media' array
     for (const mediaItem of mediaList) {
         const imageUrl = mediaItem.image_url;
@@ -138,38 +138,46 @@ export default function App() {
         for (const item of listDetections){
             console.log(item.label);
             if(item.label == "elevator"){
-                setHasElevator(true);
+                hasElevator =true;
                 console.log("Elevator detected");
                 break;
             }
         }
         // You can perform further actions with each image URL here
     }
-    setScore(score-3*stairsNum);
-    if(hasElevator){
-        if(stairsNum<3) setScore(score + 3.5);
-        else setScore(score + 2.5);
-    }
-    if(score < 0) setScore(0);
-    if(score > 10) setScore(10);
-    console.log("Score: "+ score);
-    setDisplayText(score);
+      if(hasElevator){
+          if(stairsNum > 3){
+              if((score + 2.5 -3*stairsNum)>10) score = 10;
+              else if((score + 2.5 -3*stairsNum)<0) score = 0;
+              else score += 2.5 -3*stairsNum;
+          }
+          else{
+              if((score + 3.5 -3*stairsNum) > 10) score = 10;
+              else if((score + 3.5 -3*stairsNum)<0) score = 0;
+              else score += 3.5 -3*stairsNum;
+          }
+      }
+      else{
+          if((score -3*stairsNum)>10) score = 10;
+          else if((score -3*stairsNum)<0) score = 0;
+          else score += -3*stairsNum;
+      }
+      console.log(score);
+      setDisplayText(score);
   };
 
   const handleLinkButton = async () =>{
       const data2 = await getDataFromImg(imageLink);
       console.log(data2);
 
-      console.log(score);
-      setScore(7);
-      console.log(score);
-      setNumStairs(0);
-      setHasElevator(false);
+      score = 7;
+      stairsNum = 0;
+      hasElevator = false;
 
       const listPredictions = data2.response?.solutions.re_roomtype_global_v2.predictions;
       for(const predictItem of listPredictions){
           console.log(predictItem.label+" "+predictItem.confidence+" Stairs: "+stairsNum);
-          if(predictItem.label=='stairs' && predictItem.confidence > 0.7) setNumStairs(stairsNum+1);
+          if(predictItem.label=='stairs' && predictItem.confidence > 0.7) stairsNum++;
           console.log("Stairs: "+stairsNum);
       }
 
@@ -177,21 +185,29 @@ export default function App() {
       for (const item of listDetections){
           console.log(item.label);
           if(item.label == 'elevator'){
-              setHasElevator(true);
+              hasElevator= true;
               console.log("Elevator detected");
               break;
           }
       }
-      console.log(score);
-      setScore(score - 3*stairsNum);
-      console.log(score);
       if(hasElevator){
-          if(stairsNum<3) setScore(score + 3.5);
-          else setScore(score + 2.5);
+          if(stairsNum > 3){
+              if((score + 2.5 -3*stairsNum)>10) score = 10;
+              else if((score + 2.5 -3*stairsNum)<0) score = 0;
+              else score += 2.5 -3*stairsNum;
+          }
+          else{
+              if((score + 3.5 -3*stairsNum) > 10) score = 10;
+              else if((score + 3.5 -3*stairsNum)<0) score = 0;
+              else score += 3.5 -3*stairsNum;
+          }
       }
-      if(score < 0) setScore(0);
-      else if(score > 10) setScore(10);
-      console.log("Score: "+score);
+      else{
+          if((score -3*stairsNum)>10) score = 10;
+          else if((score -3*stairsNum)<0) score = 0;
+          else score += -3*stairsNum;
+      }
+      console.log(score);
       setDisplayText(score);
   };
 
