@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import {Button, StyleSheet, Text, View, TextInput} from 'react-native';
+import {Button, StyleSheet, Text, View, TextInput, Image} from 'react-native';
 import {waitFor} from "@babel/core/lib/gensync-utils/async";
 
 
@@ -82,7 +82,7 @@ export default function App() {
     const busCount = await getDataFromLatLon(overpassQuery);
     console.log(busCount);
 
-    //const api_url = 'https://intelligence.restb.ai/v1/search/comparables?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191';
+    const api_url = 'https://intelligence.restb.ai/v1/search/comparables?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191';
   
     
     fetch(api_url, {
@@ -142,43 +142,70 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      
+      <Image
+      source={require('./assets/a.png')}  
+      style={styles.imageStyle} />
+
+      <Text style={styles.welcomeText}>Welcome to our accessibility checker</Text>
       <StatusBar style="auto" />
+      <Text>To check how accessible is a property use one of our two options:</Text>
+      <Text style={styles.Text}>SUBMIT THE FOLLOWING LOCATION INFORMATION:</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Type address..."
+        placeholder="Write address here..."
         onChangeText={handleAddressChange}
         value={addressText}
       />
       <TextInput
         style={styles.input}
-        placeholder="Type city..."
+        placeholder="Write city here..."
         onChangeText={handleCityChange}
         value={cityText}
       />
       <TextInput
         style={styles.input}
-        placeholder="Type postal code..."
+        placeholder="Write postal code here..."
         onChangeText={handleCodeChange}
         value={codeText}
       />
       <TextInput
         style={styles.input}
-        placeholder="Type state..."
+        placeholder="Write state here..."
         onChangeText={handleStateChange}
         value={stateText}
       />
       <TextInput
         style={styles.input}
-        placeholder="Type country..."
+        placeholder="Write country here..."
         onChangeText={handleCountryChange}
         value={countryText}
       />
 
-      <Button title="Press me" onPress={handleButtonPress} />
-
+      <Button 
+      title="Submit location" 
+      onPress={handleButtonPress}
+      color="orange"
+       />
       <Text>Response: {displayText}</Text>
+
+      <Text style={styles.Text}>SUBMIT THE LINK TO A HOUSE INTERIOR'S PICTURE:</Text>
+      
+      <TextInput
+        style={styles.input}
+        placeholder="Write link here..."
+        onChangeText={handleCountryChange}
+        value={countryText}
+      />
+
+      <Button 
+      title="Submit link" 
+      onPress={handleButtonPress}
+      color="orange"
+       />
+      <Text>Response: {displayText}</Text>
+      
     </View>
   );
 }
@@ -189,5 +216,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    padding: 10,
+    margin: 10,
+    width: '60%',
+  },
+  imageStyle: {
+    width: 400,
+    height: 100,
+    marginVertical: 0,
+  },
+  customButton: {
+    backgroundColor: 'orange',
+    borderRadius: 15, 
+    padding: 10,
+  },
+  buttonText: {
+    fontSize: 20,
+    color: 'white',
+    textAlign: 'center',
+  },
+  welcomeText: {
+    fontSize: 24, 
+    marginVertical: 0,
+  },
+  Text: {
+    fontSize: 21, 
+    color: 'orange',
+    fontWeight: 'bold', 
+    marginVertical: 10,
   },
 });
