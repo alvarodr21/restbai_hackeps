@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import {Button, StyleSheet, Text, View, TextInput} from 'react-native';
+import {waitFor} from "@babel/core/lib/gensync-utils/async";
+
 
 export default function App() {
   const [addressText, setAddressText] = useState('');
@@ -9,7 +11,9 @@ export default function App() {
   const [stateText, setStateText] = useState('');
   const [countryText, setCountryText] = useState('');
   const [displayText, setDisplayText] = useState('');
-
+  const [stairsNum, setNumStairs] = useState(0);
+  const [hasElevator, setHasElevator] = useState(false);
+  const [score, setScore] = useState(7);
   const handleAddressChange = (text) => {
     setAddressText(text);
   };
@@ -90,12 +94,50 @@ export default function App() {
       })
     .then(response => response.json())
     .then(data => {
-      setDisplayText(data.correlation_id);
-      console.log(data.response.comparables[0]);
+      //setDisplayText(data.correlation_id);
+      console.log(data.response.comparables[0].media);
+        // Access the 'comparables' array
+        const mediaList = data.response.comparables[0].media;
+
+        // Iterate through each image URL in the 'media' array
+        mediaList.forEach((mediaItem) => {
+            const imageUrl = mediaItem.image_url;
+            console.log(imageUrl);
+            const vision_url = 'https://api-us.restb.ai/vision/v2/multipredict?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191&model_id=re_features_v5,re_roomtype_global_v2&'+imageUrl;
+            fetch(vision_url, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+           .then(data2 => {
+                    console.log(data2);
+                    const listPredictions = data2.response?.solutions.re_roomtype_global_v2.predictions;
+                    listPredictions.forEach((item) => {
+                        if(item.label=="stairs" && item.confidence > 0.7) setNumStairs(stairsNum+1);
+                    })
+
+                    const listDetections = data2.response?.solutions.re_features_v5.detections;
+                    for (const item of listDetections){
+                        if(item.label == "elevator"){
+                            setHasElevator(true);
+                            break;
+                        }
+                    }
+                })
+            // You can perform further actions with each image URL here
+        });
+
     }).catch(error => {
       console.log(location);
       console.error('Error fetching data from the API:', error);
     }); */
+    setScore(score-3*stairsNum);
+    if(hasElevator){
+        if(stairsNum<3) setScore(score + 3.5);
+        else setScore(score + 2.5);
+    }
+    if(score < 0) setScore(0);
+    else if(score > 10) setScore(10);
+    setDisplayText(score);
   };
 
   return (
