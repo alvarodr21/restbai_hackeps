@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import {Button, StyleSheet, Text, View, TextInput} from 'react-native';
+import {waitFor} from "@babel/core/lib/gensync-utils/async";
 
 export default function App() {
   const [addressText, setAddressText] = useState('');
@@ -47,7 +48,24 @@ export default function App() {
     .then(response => response.json())
     .then(data => {
       setDisplayText(data.correlation_id);
-      console.log(data.response.comparables[0]);
+      console.log(data.response.comparables[0].media);
+        // Access the 'comparables' array
+        const mediaList = data.response.comparables[0].media;
+
+        // Iterate through each image URL in the 'media' array
+        mediaList.forEach((mediaItem) => {
+            const imageUrl = mediaItem.image_url;
+            console.log(imageUrl);
+            const vision_url = 'https://api-us.restb.ai/vision/v2/multipredict?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191&model_id=re_features_v5,re_roomtype_global_v2&'+imageUrl;
+            fetch(vision_url, {
+                method: 'GET'
+            })
+           .then(data => {
+                    console.log(data.response.solutions.re_roomtype_global_v2.predictions[0].label);
+                })
+            // You can perform further actions with each image URL here
+        });
+
     }).catch(error => {
       console.log(location);
       console.error('Error fetching data from the API:', error);
