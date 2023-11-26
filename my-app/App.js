@@ -14,6 +14,7 @@ export default function App() {
   const [stairsNum, setNumStairs] = useState(0);
   const [hasElevator, setHasElevator] = useState(false);
   const [score, setScore] = useState(7);
+  const [imageLink, setLink] = useState('');
   const handleAddressChange = (text) => {
     setAddressText(text);
   };
@@ -28,6 +29,9 @@ export default function App() {
   };
   const handleCountryChange = (text) => {
     setCountryText(text);
+  };
+  const handleImageLink = (text) => {
+    setLink(text);
   };
 
   const getLatLonFromLocation = (location) => {
@@ -81,7 +85,7 @@ export default function App() {
   const getDataFromImg = async (imageUrl) => {
     const vision_url = 'https://api-us.restb.ai/vision/v2/multipredict?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191&model_id=re_features_v5,re_roomtype_global_v2&image_url='+imageUrl;
     const test = 'https://api-us.restb.ai/vision/v2/multipredict?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191&model_id=re_features_v5,re_roomtype_global_v2&image_url=https://www.iberdrola.com/documents/20125/40759/elevator_746x419.jpg/9c929186-1f87-1a5c-b009-553b0a004ed7?t=1627624814432';
-    return fetch(test, {
+    return fetch(vision_url, {
         method: 'GET'
     })
     .then(response => {return response.json()});
@@ -111,7 +115,9 @@ export default function App() {
 
     const mediaList = await getMediaList(location);
     console.log("Control first POST\n"+mediaList);
-
+    setScore(7);
+    setNumStairs(0);
+    setHasElevator(false);
     // Iterate through each image URL in the 'media' array
     for (const mediaItem of mediaList) {
         const imageUrl = mediaItem.image_url;
@@ -123,7 +129,6 @@ export default function App() {
         const listPredictions = data2.response?.solutions.re_roomtype_global_v2.predictions;
         for(const predictItem of listPredictions){
             console.log(predictItem.label+" "+predictItem.confidence+" Stairs: "+stairsNum);
-            //predictItem.label = 'stairs';
 
             if(predictItem.label=='stairs' && predictItem.confidence > 0.7) setNumStairs(stairsNum+1);
             console.log("Stairs: "+stairsNum);
@@ -146,10 +151,50 @@ export default function App() {
         else setScore(score + 2.5);
     }
     if(score < 0) setScore(0);
-    else if(score > 10) setScore(10);
-    console.log("Score: "+score)
+    if(score > 10) setScore(10);
+    console.log("Score: "+ score);
     setDisplayText(score);
   };
+
+  const handleLinkButton = async () =>{
+      const data2 = await getDataFromImg(imageLink);
+      console.log(data2);
+
+      console.log(score);
+      setScore(7);
+      console.log(score);
+      setNumStairs(0);
+      setHasElevator(false);
+
+      const listPredictions = data2.response?.solutions.re_roomtype_global_v2.predictions;
+      for(const predictItem of listPredictions){
+          console.log(predictItem.label+" "+predictItem.confidence+" Stairs: "+stairsNum);
+          if(predictItem.label=='stairs' && predictItem.confidence > 0.7) setNumStairs(stairsNum+1);
+          console.log("Stairs: "+stairsNum);
+      }
+
+      const listDetections = data2.response?.solutions.re_features_v5.detections;
+      for (const item of listDetections){
+          console.log(item.label);
+          if(item.label == 'elevator'){
+              setHasElevator(true);
+              console.log("Elevator detected");
+              break;
+          }
+      }
+      console.log(score);
+      setScore(score - 3*stairsNum);
+      console.log(score);
+      if(hasElevator){
+          if(stairsNum<3) setScore(score + 3.5);
+          else setScore(score + 2.5);
+      }
+      if(score < 0) setScore(0);
+      else if(score > 10) setScore(10);
+      console.log("Score: "+score);
+      setDisplayText(score);
+  };
+
   return (
     <View style={styles.container}>
       
@@ -206,13 +251,13 @@ export default function App() {
       <TextInput
         style={styles.input}
         placeholder="Write link here..."
-        onChangeText={handleCountryChange}
-        value={countryText}
+        onChangeText={handleImageLink}
+        value={imageLink}
       />
 
       <Button 
       title="Submit link" 
-      onPress={handleButtonPress}
+      onPress={handleLinkButton}
       color="orange"
        />
       {displayText !== '' && <Text style={styles.resultText}>Result: {displayText}</Text>}
