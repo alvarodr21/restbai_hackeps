@@ -26,7 +26,37 @@ export default function App() {
     setCountryText(text);
   };
 
-  const handleButtonPress = () => {
+  const getLatLonFromLocation = (location) => {
+    console.log(location);
+    const { street_address, city, postal_code, state, country } = location.location;
+    const address = `${street_address}, ${city}, ${postal_code}, ${state}, ${country}`;
+    const geocode_key = 'eb043604731044e1a72e47936d0f0c47';
+    const geocode_url = `https://api.opencagedata.com/geocode/v1/json?q=${address}&key=${geocode_key}`;
+  
+    return fetch(geocode_url)
+      .then(response => response.json())
+      .then(data => {
+        const lat = data.results[0].geometry.lat;
+        const lon = data.results[0].geometry.lng;
+        return { lat, lon };
+      });
+  };
+
+  const getDataFromLatLon = async (overpassQuery) => {
+    return fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `data=${encodeURIComponent(overpassQuery)}`,
+    })
+    .then(response => response.json())
+    .then(data => {
+      return data.elements.length;
+    });
+  };
+
+  const handleButtonPress = async () => {
     const location = {
       "location": {
         "street_address": addressText.trim() === '' ? '1646 E ELMORE AVE' : addressText,
@@ -36,8 +66,22 @@ export default function App() {
         "country": countryText.trim() === '' ? 'US' : countryText
       }
     };
-    const api_url = 'https://intelligence.restb.ai/v1/search/comparables?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191';
-    fetch(api_url, {
+
+    //const { lat, lon } = await getLatLonFromLocation(location);
+    const lat = '32.7175991';
+    const lon = '-96.7981047'
+    console.log(`Latitude: ${lat}, Longitude: ${lon}`);
+
+
+    const overpassTemplate = `[out:json];(nodeQUESTION(around:1000,${lat},${lon}););out;`;
+    const overpassQuery = overpassTemplate.replace('QUESTION', '["public_transport"]["wheelchair"="yes"]');
+    const busCount = await getDataFromLatLon(overpassQuery);
+    console.log(busCount);
+
+    //const api_url = 'https://intelligence.restb.ai/v1/search/comparables?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191';
+  
+    
+    /* fetch(api_url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +95,7 @@ export default function App() {
     }).catch(error => {
       console.log(location);
       console.error('Error fetching data from the API:', error);
-    });
+    }); */
   };
 
   return (
