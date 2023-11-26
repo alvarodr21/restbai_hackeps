@@ -105,8 +105,8 @@ export default function App() {
 
       <Text style={styles.welcomeText}>Welcome to our accessibility checker</Text>
       <StatusBar style="auto" />
-      <Text>To check how accessible is a property use one of our two options:</Text>
-      <Text style={styles.Text}>SUBMIT THE FOLLOWING LOCATION INFORMATION:</Text>
+      <Text style={styles.Text2}>To check how accessible a property is for a person with reduced mobility, use one of our two options:</Text>
+      <Text style={styles.Text}>SUBMIT THE LOCATION INFORMATION:</Text>
 
       <TextInput
         style={styles.input}
@@ -140,11 +140,12 @@ export default function App() {
       />
 
       <Button 
-      title="Submit location" 
-      onPress={handleButtonPress}
-      color="orange"
+        title="Submit location" 
+        onPress={handleButtonPress}
+        color="orange"
        />
-      <Text>Response: {displayText}</Text>
+      {displayText !== '' && <Text style={styles.resultText}>Result: {displayText}</Text>}
+      <Text style={styles.Text3}>       </Text>
 
       <Text style={styles.Text}>SUBMIT THE LINK TO A HOUSE INTERIOR'S PICTURE:</Text>
       
@@ -160,8 +161,8 @@ export default function App() {
       onPress={handleButtonPress}
       color="orange"
        />
-      <Text>Response: {displayText}</Text>
-      
+      {displayText !== '' && <Text style={styles.resultText}>Result: {displayText}</Text>}
+      <Text style={styles.Text3}>       </Text>
     </View>
   );
 }
@@ -199,10 +200,26 @@ const styles = StyleSheet.create({
     fontSize: 24, 
     marginVertical: 0,
   },
+  Text3: {
+    fontSize: 24, 
+    marginVertical: 5,
+    color: 'white',
+  },
   Text: {
-    fontSize: 21, 
+    fontSize: 20, 
     color: 'orange',
     fontWeight: 'bold', 
     marginVertical: 10,
   },
+  Text2: {
+    fontSize: 15, 
+    color: 'grey', 
+    marginVertical: 10,
+    maxWidth: '80%', 
+    textAlign: 'center', 
+  },
+  resultText: {
+    marginVertical: 20, 
+  },
+  
 });
