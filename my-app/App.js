@@ -11,6 +11,7 @@ export default function App() {
   const [stateText, setStateText] = useState('');
   const [countryText, setCountryText] = useState('');
   let [displayText, setDisplayText] = useState('');
+  let [scoreN, setScoreN] = useState('');
   let [stairsNum, setNumStairs] = useState(0);
   let [hasElevator, setHasElevator] = useState(false);
   let [score, setScore] = useState(7);
@@ -183,6 +184,18 @@ export default function App() {
       }
       console.log(score);
       setDisplayText(score);
+
+      let footwayVar = footwayCount/2000;
+      console.log(footwayCount+" "+footwayVar);
+      let pathVar = pathCount/12;
+      console.log(pathCount+" "+pathVar);
+      let busVar = busCount/250;
+      console.log(busCount+" "+busVar);
+      let busEasy = busEasyCount/50;
+      console.log(busEasyCount+" "+busEasy);
+      let scoreNeighborhood = (footwayVar*0.38 + pathVar*0.2 + busVar*0.1386 + busEasy*0.2814)*10;
+      console.log(scoreNeighborhood);
+      setScoreN(scoreNeighborhood);
   };
 
   const handleLinkButton = async () =>{
@@ -278,7 +291,8 @@ export default function App() {
         onPress={handleButtonPress}
         color="orange"
        />
-        {displayText !== '' && <Text style={styles.resultText}>Result: {displayText}</Text>}
+        {displayText !== '' && <Text style={styles.resultText}>Home score: {displayText}</Text>}
+        {scoreN !== '' && <Text style={styles.resultText}>Neighborhood score: {scoreN}</Text>}
       <Text style={styles.Text3}>       </Text>
 
       <Text style={styles.Text}>SUBMIT THE LINK TO A HOUSE INTERIOR'S PICTURE:</Text>
