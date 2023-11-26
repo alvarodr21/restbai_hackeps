@@ -85,7 +85,7 @@ export default function App() {
     //const api_url = 'https://intelligence.restb.ai/v1/search/comparables?client_key=8aea16ffd5b8c063504c71d62870abd980fa001c70d530fe6c33345bfdfb8191';
   
     
-    /* fetch(api_url, {
+    fetch(api_url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ export default function App() {
     }).catch(error => {
       console.log(location);
       console.error('Error fetching data from the API:', error);
-    }); */
+    });
     setScore(score-3*stairsNum);
     if(hasElevator){
         if(stairsNum<3) setScore(score + 3.5);
